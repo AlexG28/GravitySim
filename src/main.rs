@@ -15,6 +15,7 @@ mod object;
 
 pub struct App {
     gl: GlGraphics,
+    objects: Vec<object::Object>,
     x: i32,
     y: i32, 
     x_vel: i32,
@@ -22,14 +23,14 @@ pub struct App {
 }
 
 impl App{
-    fn render(&mut self, args: &RenderArgs, earth: &object::Object){
+    fn render(&mut self, args: &RenderArgs){
         use graphics::*;
 
         const BACKGROUND: [f32; 4] = [62.0/255.0, 199.0/255.0, 230.0/255.0, 1.0];
         const FOREGROUND: [f32; 4] = [192.0/255.0, 27.0/255.0, 247.0/255.0, 1.0];
 
         let main_rect = rectangle::square(0.0, 0.0, 50.0);
-        let earth_rect = rectangle::square(0.0, 0.0, 50.0);
+        //let earth_rect = rectangle::square(0.0, 0.0, 50.0);
 
 
         self.gl.draw(args.viewport(), |c, gl| {
@@ -49,16 +50,16 @@ impl App{
                 gl);
             */
 
-            circle_arc(
-                FOREGROUND,
-                53.0,
-                77.0,
-                47.0,
-                earth_rect, 
-                c.transform.trans(earth.x_pos, earth.y_pos),
-                gl);
-
-
+            for obj in self.objects.iter() {
+                circle_arc(
+                    FOREGROUND,
+                    53.0,
+                    77.0,
+                    47.0,
+                    main_rect,
+                    c.transform.trans(obj.x_pos, obj.y_pos), 
+                    gl);
+            }
         });
     }
 
@@ -92,14 +93,6 @@ fn main() {
         .unwrap();
 
 
-    let mut app = App{
-        gl: GlGraphics::new(opengl),
-        x: 150,
-        y: 300,
-        x_vel: 0,
-        y_vel: 0,
-    };
-
     let earth = object::Object::new(
         "Earth".to_string(), 
         400.0, 
@@ -108,12 +101,29 @@ fn main() {
         0.0, 
         269);
 
+    let mars = object::Object::new(
+        "Mars".to_string(), 
+        700.0, 
+        300.0, 
+        0.0, 
+        0.0, 
+        123);
+
+    let mut app = App{
+        gl: GlGraphics::new(opengl),
+        objects: vec![earth, mars],
+        x: 150,
+        y: 300,
+        x_vel: 0,
+        y_vel: 0,
+    };
+
 
     let mut events = Events::new(EventSettings::new());
 
     while let Some(e) = events.next(&mut window) {
         if let Some(r) = e.render_args(){
-            app.render(&r, &earth);
+            app.render(&r);
         }
 
         if let Some(_u) = e.update_args(){
