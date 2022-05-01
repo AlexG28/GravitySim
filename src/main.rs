@@ -15,6 +15,7 @@ mod object;
 
 const WIDTH: u32 = 1280;
 const HEIGHT: u32 = 720;
+const G: f64 = 0.000000000066743;
 
 pub struct App {
     gl: GlGraphics,
@@ -65,6 +66,16 @@ impl App{
     }
 
     fn update(&mut self) {
+        
+        /*
+            for currObj in self.objects: 
+                for obj in self.objects: 
+                    distance = find_distance(currObj, obj)
+        
+        */
+
+        
+        
         for i in 0..self.objects.len() {
             self.objects[i].x_pos += self.objects[i].x_vel;
             self.objects[i].y_pos += self.objects[i].y_vel;
@@ -84,8 +95,34 @@ impl App{
         if let &Button::Keyboard(key) = args {
             match key {
                 Key::S => {
-                    println!("Pressed. velocity is: {} and current x is: {}", self.x_vel, self.x);
-                    self.x_vel += 1;
+                    //println!("Pressed. velocity is: {} and current x is: {}", self.x_vel, self.x);
+                    
+                    if self.objects.len() != 0 {
+                        for curr_obj in self.objects.iter() {
+                            for other_obj in self.objects.iter() {
+                                let distance = find_distance(
+                                    curr_obj.x_pos,
+                                    curr_obj.y_pos, 
+                                    other_obj.x_pos, 
+                                    other_obj.y_pos);
+                                    
+
+                                let angle = find_angle(
+                                    curr_obj.x_pos,
+                                    curr_obj.y_pos, 
+                                    other_obj.x_pos, 
+                                    other_obj.y_pos);
+                                
+                                
+                                if distance != 0.0 {
+                                    println!("stats from {} to {}    is {}     rad: {}", curr_obj.name, other_obj.name,&distance, &angle);
+                                    println!("The force is: {}", find_force(curr_obj.mass as f64, other_obj.mass as f64, distance));
+                                }
+                            }
+                        }
+                    }
+                    
+                    //self.x_vel += 1;
                 }
 
                 _ => {}
@@ -95,15 +132,15 @@ impl App{
         if let &Button::Mouse(MouseButton) = args {
             match MouseButton {
                 MouseButton::Left => {
-                    println!("This is a left click at x: {} and y: {}", self.cursor_x, self.cursor_y);
+                    //println!("This is a left click at x: {} and y: {}", self.cursor_x, self.cursor_y);
                 
                     self.objects.push(
                         object::Object::new(
                             "Neptune".to_string(), 
                             self.cursor_x, 
                             self.cursor_y, 
-                            -1.0, 
-                            -1.0, 
+                            0.0, 
+                            0.0, 
                             12311, 
                         )
                     );
@@ -114,6 +151,18 @@ impl App{
     }
 }
 
+
+fn find_distance(x1: f64, y1: f64, x2: f64, y2: f64) -> f64 {
+    ((x2 - x1).powi(2) + (y2 - y1).powi(2)).sqrt()
+}
+
+fn find_angle(x1: f64, y1: f64, x2: f64, y2: f64) -> f64 {
+    -(y2-y1).atan2(x2-x1)
+}
+
+fn find_force(m1: f64, m2: f64, r: f64) -> f64 {
+    (G * m1 * m2) / r.powi(2)
+}
 
 fn main() {
     let opengl = OpenGL::V4_5;
@@ -126,12 +175,13 @@ fn main() {
 
     let earth = object::Object::new(
         "Earth".to_string(), 
-        400.0, 
+        700.0, 
         400.0, 
         0.0, 
         0.0, 
         269);
 
+    
     let mars = object::Object::new(
         "Mars".to_string(), 
         700.0, 
@@ -139,10 +189,19 @@ fn main() {
         0.0, 
         0.0, 
         123);
-
+    
+    let jupiter = object::Object::new(
+        "Jupiter".to_string(), 
+        800.0, 
+        400.0, 
+        0.0, 
+        0.0, 
+        123);
+        
+    
     let mut app = App {
         gl: GlGraphics::new(opengl),
-        objects: vec![earth, mars],
+        objects: vec![earth, mars, jupiter],
         cursor_x: 0.0,
         cursor_y: 0.0,
         x: 150,
