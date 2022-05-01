@@ -114,9 +114,18 @@ impl App{
                                     other_obj.y_pos);
                                 
                                 
+                                let force = find_force(curr_obj.mass as f64, other_obj.mass as f64, distance);
+                                let x = force * angle.cos();
+                                let y = -1.0 * force * angle.sin(); // -1 to adjust for the way pixels are counted starting from the top
+
+                                let x_acc = x / curr_obj.mass as f64; // force = mass * acceleration
+                                let y_acc = y / curr_obj.mass as f64;
+
+
                                 if distance != 0.0 {
                                     println!("stats from {} to {}    is {}     rad: {}", curr_obj.name, other_obj.name,&distance, &angle);
-                                    println!("The force is: {}", find_force(curr_obj.mass as f64, other_obj.mass as f64, distance));
+                                    println!("The force is: {}", force);
+                                    println!("force for {} in x: {}    y: {}\n", curr_obj.name, x_acc, y_acc);
                                 }
                             }
                         }
@@ -136,7 +145,7 @@ impl App{
                 
                     self.objects.push(
                         object::Object::new(
-                            "Neptune".to_string(), 
+                            "Unnamed".to_string(), 
                             self.cursor_x, 
                             self.cursor_y, 
                             0.0, 
@@ -161,7 +170,7 @@ fn find_angle(x1: f64, y1: f64, x2: f64, y2: f64) -> f64 {
 }
 
 fn find_force(m1: f64, m2: f64, r: f64) -> f64 {
-    (G * m1 * m2) / r.powi(2)
+    (m1 * m2) / r.powi(2)
 }
 
 fn main() {
@@ -179,7 +188,7 @@ fn main() {
         400.0, 
         0.0, 
         0.0, 
-        269);
+        4000);
 
     
     let mars = object::Object::new(
@@ -188,7 +197,7 @@ fn main() {
         300.0, 
         0.0, 
         0.0, 
-        123);
+        2000);
     
     let jupiter = object::Object::new(
         "Jupiter".to_string(), 
@@ -196,7 +205,7 @@ fn main() {
         400.0, 
         0.0, 
         0.0, 
-        123);
+        16000);
         
     
     let mut app = App {
