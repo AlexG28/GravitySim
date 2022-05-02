@@ -40,12 +40,6 @@ impl App{
         self.gl.draw(args.viewport(), |c, gl| {
 
             clear(BACKGROUND, gl);
-            
-            rectangle(
-                FOREGROUND, 
-                main_rect, 
-                c.transform.trans(self.x as f64, self.y as f64), 
-                gl);
 
             for obj in self.objects.iter() {
                 circle_arc(
@@ -67,19 +61,85 @@ impl App{
 
     fn update(&mut self) {
         
-        /*
-            for currObj in self.objects: 
-                for obj in self.objects: 
-                    distance = find_distance(currObj, obj)
         
-        */
+        if self.objects.len() != 0 {
+
+        }
+
 
         
+        if self.objects.len() != 0 {
+
+            let mut temp_vec: Vec<(f64, f64)> = vec![];
+
+            for curr_obj in self.objects.iter() {                
+                for other_obj in self.objects.iter() {
+                    let distance = find_distance( // distance
+                        curr_obj.x_pos,
+                        curr_obj.y_pos, 
+                        other_obj.x_pos, 
+                        other_obj.y_pos);
+                    
+
+                    if distance == 0.0 {
+                        break
+                    }
+                        
+
+                    let angle = find_angle( // angle
+                        curr_obj.x_pos,
+                        curr_obj.y_pos, 
+                        other_obj.x_pos, 
+                        other_obj.y_pos);
+                    
+                    
+                    let force = find_force( // force 
+                        curr_obj.mass as f64, 
+                        other_obj.mass as f64, 
+                        distance);
+
+
+                     // -1 to adjust for the way pixels are counted starting from the top
+                    let mut x_acc = force * angle.cos() / curr_obj.mass as f64; // force = mass * acceleration
+                    let mut y_acc = -1.0 * force * angle.sin() / curr_obj.mass as f64;
+
+                    if x_acc < 0.0000000 { 
+                        x_acc = 0.0;
+                    }
+
+                    if y_acc < 0.0000000 { 
+                        y_acc = 0.0;
+                    }
+
+                    temp_vec.push((x_acc, y_acc));
+
+                    // curr_obj.x_vel += x_acc; // add acceleration to the velocity 
+                    // curr_obj.y_vel += y_acc;
+
+                    /*
+                    if distance != 0.0 {
+                        println!("stats from {} to {}    is {}     rad: {}", curr_obj.name, other_obj.name,&distance, &angle);
+                        println!("The force is: {}", force);
+                        println!("force for {} in x: {}    y: {}\n", curr_obj.name, x_acc, y_acc);
+                    }
+                    */
+                }
+            }
+
+
+            for i in 0..(temp_vec.len() - 1) {
+                self.objects[i].x_vel += temp_vec[i].0;
+                self.objects[i].y_vel += temp_vec[i].1;
+            }
+
+
+        }
         
-        for i in 0..self.objects.len() {
-            self.objects[i].x_pos += self.objects[i].x_vel;
-            self.objects[i].y_pos += self.objects[i].y_vel;
-        } 
+    
+        for elem in self.objects.iter_mut() {
+            elem.x_pos += elem.x_vel;
+            elem.y_pos += elem.y_vel;
+        }
 
         self.objects.retain(|elem| 
             elem.x_pos < (WIDTH + 50) as f64 && 
@@ -96,40 +156,7 @@ impl App{
             match key {
                 Key::S => {
                     //println!("Pressed. velocity is: {} and current x is: {}", self.x_vel, self.x);
-                    
-                    if self.objects.len() != 0 {
-                        for curr_obj in self.objects.iter() {
-                            for other_obj in self.objects.iter() {
-                                let distance = find_distance(
-                                    curr_obj.x_pos,
-                                    curr_obj.y_pos, 
-                                    other_obj.x_pos, 
-                                    other_obj.y_pos);
-                                    
-
-                                let angle = find_angle(
-                                    curr_obj.x_pos,
-                                    curr_obj.y_pos, 
-                                    other_obj.x_pos, 
-                                    other_obj.y_pos);
-                                
-                                
-                                let force = find_force(curr_obj.mass as f64, other_obj.mass as f64, distance);
-                                let x = force * angle.cos();
-                                let y = -1.0 * force * angle.sin(); // -1 to adjust for the way pixels are counted starting from the top
-
-                                let x_acc = x / curr_obj.mass as f64; // force = mass * acceleration
-                                let y_acc = y / curr_obj.mass as f64;
-
-
-                                if distance != 0.0 {
-                                    println!("stats from {} to {}    is {}     rad: {}", curr_obj.name, other_obj.name,&distance, &angle);
-                                    println!("The force is: {}", force);
-                                    println!("force for {} in x: {}    y: {}\n", curr_obj.name, x_acc, y_acc);
-                                }
-                            }
-                        }
-                    }
+                    println!("Hello bahahaha");
                     
                     //self.x_vel += 1;
                 }
