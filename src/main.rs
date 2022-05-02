@@ -22,10 +22,6 @@ pub struct App {
     objects: Vec<object::Object>,
     cursor_x: f64,
     cursor_y: f64,
-    x: i32,
-    y: i32, 
-    x_vel: i32,
-    y_vel: i32,
 }
 
 impl App{
@@ -60,25 +56,16 @@ impl App{
     }
 
     fn update(&mut self) {
-        
-        
         if self.objects.len() != 0 {
-
-        }
-
-
-        
-        if self.objects.len() != 0 {
-
-            let mut temp_vec: Vec<(f64, f64)> = vec![];
-
-            for curr_obj in self.objects.iter() {                
-                for other_obj in self.objects.iter() {
+            let length = self.objects.len();
+            for i in 0..(length - 1) {                
+                for j in 0..(length - 1){ // doesn't work????
+                    
                     let distance = find_distance( // distance
-                        curr_obj.x_pos,
-                        curr_obj.y_pos, 
-                        other_obj.x_pos, 
-                        other_obj.y_pos);
+                        self.objects[i].x_pos, 
+                        self.objects[i].y_pos,
+                        self.objects[j].x_pos, 
+                        self.objects[j].y_pos);
                     
 
                     if distance == 0.0 {
@@ -87,21 +74,21 @@ impl App{
                         
 
                     let angle = find_angle( // angle
-                        curr_obj.x_pos,
-                        curr_obj.y_pos, 
-                        other_obj.x_pos, 
-                        other_obj.y_pos);
+                        self.objects[i].x_pos, 
+                        self.objects[i].y_pos,
+                        self.objects[j].x_pos, 
+                        self.objects[j].y_pos);
                     
                     
                     let force = find_force( // force 
-                        curr_obj.mass as f64, 
-                        other_obj.mass as f64, 
+                        self.objects[i].mass as f64, 
+                        self.objects[j].mass as f64, 
                         distance);
 
 
                      // -1 to adjust for the way pixels are counted starting from the top
-                    let mut x_acc = force * angle.cos() / curr_obj.mass as f64; // force = mass * acceleration
-                    let mut y_acc = -1.0 * force * angle.sin() / curr_obj.mass as f64;
+                    let mut x_acc = force * angle.cos() / self.objects[i].mass as f64; // force = mass * acceleration
+                    let mut y_acc = -1.0 * force * angle.sin() / self.objects[i].mass as f64;
 
                     if x_acc < 0.0000000 { 
                         x_acc = 0.0;
@@ -111,10 +98,10 @@ impl App{
                         y_acc = 0.0;
                     }
 
-                    temp_vec.push((x_acc, y_acc));
+                    // temp_vec.push((x_acc, y_acc));
 
-                    // curr_obj.x_vel += x_acc; // add acceleration to the velocity 
-                    // curr_obj.y_vel += y_acc;
+                    self.objects[i].x_vel += x_acc; // add acceleration to the velocity 
+                    self.objects[i].y_vel += y_acc;
 
                     /*
                     if distance != 0.0 {
@@ -125,14 +112,6 @@ impl App{
                     */
                 }
             }
-
-
-            for i in 0..(temp_vec.len() - 1) {
-                self.objects[i].x_vel += temp_vec[i].0;
-                self.objects[i].y_vel += temp_vec[i].1;
-            }
-
-
         }
         
     
@@ -146,9 +125,6 @@ impl App{
             elem.y_pos < (HEIGHT + 50) as f64 &&
             elem.x_pos > -50.0 &&
             elem.y_pos > -50.0);
-
-        self.x += self.x_vel;
-        self.y += self.y_vel;
     }
 
     fn press(&mut self, args: &Button){
@@ -211,8 +187,8 @@ fn main() {
 
     let earth = object::Object::new(
         "Earth".to_string(), 
-        700.0, 
-        400.0, 
+        300.0, 
+        500.0, 
         0.0, 
         0.0, 
         4000);
@@ -220,8 +196,8 @@ fn main() {
     
     let mars = object::Object::new(
         "Mars".to_string(), 
-        700.0, 
         300.0, 
+        100.0, 
         0.0, 
         0.0, 
         2000);
@@ -229,7 +205,7 @@ fn main() {
     let jupiter = object::Object::new(
         "Jupiter".to_string(), 
         800.0, 
-        400.0, 
+        500.0, 
         0.0, 
         0.0, 
         16000);
@@ -240,10 +216,6 @@ fn main() {
         objects: vec![earth, mars, jupiter],
         cursor_x: 0.0,
         cursor_y: 0.0,
-        x: 150,
-        y: 300,
-        x_vel: 0,
-        y_vel: 0,
     };
 
 
