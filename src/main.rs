@@ -59,7 +59,7 @@ impl App{
         if self.objects.len() != 0 {
             let length = self.objects.len();
             for i in 0..(length - 1) {                
-                for j in 0..(length - 1){ // doesn't work????
+                'inner: for j in 0..(length - 1){ // doesn't work????
                     
                     let distance = find_distance( // distance
                         self.objects[i].x_pos, 
@@ -69,7 +69,8 @@ impl App{
                     
 
                     if distance == 0.0 {
-                        break
+                        // break 'inner;
+                        continue 'inner;
                     }
                         
 
@@ -103,13 +104,6 @@ impl App{
                     self.objects[i].x_vel += x_acc; // add acceleration to the velocity 
                     self.objects[i].y_vel += y_acc;
 
-                    /*
-                    if distance != 0.0 {
-                        println!("stats from {} to {}    is {}     rad: {}", curr_obj.name, other_obj.name,&distance, &angle);
-                        println!("The force is: {}", force);
-                        println!("force for {} in x: {}    y: {}\n", curr_obj.name, x_acc, y_acc);
-                    }
-                    */
                 }
             }
         }
@@ -153,7 +147,7 @@ impl App{
                             self.cursor_y, 
                             0.0, 
                             0.0, 
-                            12311, 
+                            2000, 
                         )
                     );
                 }
